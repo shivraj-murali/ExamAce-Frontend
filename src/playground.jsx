@@ -1,47 +1,44 @@
 import React, { useState, useRef, useEffect } from "react";
 
 const AIChatInterface = () => {
-  // State to manage chat messages
   const [question, setQuestion] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => {
+    const savedMessages = localStorage.getItem('chatMessages');
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Function to scroll to the bottom of messages
+  useEffect(() => {
+    localStorage.setItem('chatMessages', JSON.stringify(messages));
+  }, [messages]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // Mock function to simulate AI response
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Trim the question and ignore if empty
     const trimmedQuestion = question.trim();
     if (!trimmedQuestion) return;
 
-    // Add user message to chat history
     const userMessage = {
       id: Date.now(),
       type: "user",
       content: trimmedQuestion,
+      timestamp: new Date(),
     };
 
-    // Update messages with user question
     setMessages((prevMessages) => [...prevMessages, userMessage]);
-
-    // Reset input and set loading
     setQuestion("");
     setIsLoading(true);
 
-    // Simulate API delay and response
     setTimeout(() => {
-      // Array of mock responses
       const mockResponses = [
         "That's an interesting question! Let me think about it.",
         "AI is processing your query with advanced algorithms.",
@@ -50,148 +47,153 @@ const AIChatInterface = () => {
         "Analyzing the context and preparing a comprehensive response.",
       ];
 
-      // Select a random mock response
       const randomResponse =
         mockResponses[Math.floor(Math.random() * mockResponses.length)];
 
-      // Add AI response to chat history
       const aiMessage = {
         id: Date.now() + 1,
         type: "ai",
         content: randomResponse,
+        timestamp: new Date(),
       };
 
       setMessages((prevMessages) => [...prevMessages, aiMessage]);
       setIsLoading(false);
-    }, 1500); // Simulate a 1.5-second delay
+    }, 1500);
+  };
+
+  const formatTime = (timestamp) => {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
-    <>
-      <h1 className="text-3xl ml-3 font-bold mb-6"> Ask Your Questions 🧐</h1>
-      <div className="flex h-[80vh] w-[68%] ml-[20%]">
-        {/* Left Pane - Question Input */}
-        <div className="w-screen p-2 border-r bg-gray-50">
-          <div className="bg-white shadow-md rounded-lg h-full p-4">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">
-              Ask ExamAce
-            </h2>
+    <div className="flex flex-col h-screen bg-[#24252b] text-white font-serif">
+      {/* Top Navigation Bar */}
+      <nav className="bg-[#1a1b1f] border-b border-gray-700">
+        <div className="h-16 px-4 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-semibold text-white">ExamAce</h1>
+          </div>
+        </div>
+      </nav>
 
-            {/* Chat History */}
-            <div className="h-[calc(100%-200px)] overflow-y-auto mb-4 space-y-2">
+      {/* Main Content Area */}
+      <div className="flex-1 flex justify-center">
+        {/* Main Chat Area */}
+        <div className="w-3/4 flex flex-col">
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto px-4 py-6">
+            <div className="space-y-6">
+              {messages.length === 0 && (
+                <div className="text-center py-12">
+                  <h2 className="text-2xl font-bold text-white mb-2">Welcome to ExamAce</h2>
+                  <p className="text-gray-300 text-lg">Ask me anything, and I'll help you find answers</p>
+                </div>
+              )}
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`p-2 rounded-lg max-w-full 
-                  ${
-                    message.type === "user"
-                      ? "bg-blue-100 text-blue-800 text-right"
-                      : "bg-gray-100 text-gray-800 text-left"
-                  }`}
+                  className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  {message.content}
+                  <div
+                    className={`group relative max-w-[85%] px-6 py-4 rounded-2xl ${
+                      message.type === "user"
+                        ? "bg-blue-600 text-white"
+                        : "bg-[#1a1b1f] text-white shadow-sm border border-gray-700"
+                    }`}
+                  >
+                    {message.type === "ai" && (
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 flex items-center justify-center">
+                          <span className="text-white text-xs font-medium">EA</span>
+                        </div>
+                        <span className="text-xs text-gray-300">ExamAce</span>
+                      </div>
+                    )}
+                    <div className={`text-[15px] leading-relaxed ${message.type === "user" ? "" : "text-white"}`}>
+                      {message.content}
+                    </div>
+                    <div className={`mt-2 text-xs ${message.type === "user" ? "text-blue-100" : "text-gray-400"}`}>
+                      {formatTime(message.timestamp)}
+                    </div>
+                  </div>
                 </div>
               ))}
               {isLoading && (
-                <div className="p-2 bg-gray-100 text-gray-800 rounded-lg flex items-center">
-                  <svg
-                    className="animate-spin h-5 w-5 text-blue-500 mr-2"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  AI is thinking...
+                <div className="flex justify-start">
+                  <div className="bg-[#1a1b1f] text-white rounded-2xl px-6 py-4 max-w-[85%] shadow-sm border border-gray-700">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 flex items-center justify-center">
+                        <span className="text-white text-xs font-medium">EA</span>
+                      </div>
+                      <span className="text-xs text-gray-300">ExamAce</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                      </div>
+                      <span className="text-[15px] text-gray-300">Thinking...</span>
+                    </div>
+                  </div>
                 </div>
               )}
               <div ref={messagesEndRef} />
             </div>
+          </div>
 
-            {/* Input Area */}
-            <form onSubmit={handleSubmit} className="flex flex-col">
-              <textarea
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Type your question here..."
-                className="flex-grow resize-none mb-4 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                required
-              />
-              <button
-                type="submit"
-                disabled={!question}
-                className="bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 
-                         transition duration-300 ease-in-out
-                         disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-                Submit Question
-              </button>
+          {/* Input Area */}
+          <div className="border-t border-gray-700 bg-[#1a1b1f] p-4">
+            <form onSubmit={handleSubmit}>
+              <div className="relative">
+                <textarea
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      if (question.trim()) handleSubmit(e);
+                    }
+                  }}
+                  placeholder="Ask anything..."
+                  className="w-full resize-none p-4 pr-12 border border-gray-700 rounded-xl
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                           text-[15px] placeholder-gray-400 bg-[#24252b] text-white
+                           min-h-[56px] max-h-[200px]"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={!question.trim()}
+                  className="absolute right-3 bottom-[13px] bg-blue-600 text-white p-2 rounded-lg
+                           hover:bg-blue-700 transition-colors duration-200
+                           disabled:bg-gray-700 disabled:cursor-not-allowed"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
             </form>
           </div>
         </div>
-
-        {/* Right Pane - AI Response */}
-        <div className="w-screen p-2 bg-gray-50">
-          <div className="bg-white shadow-md rounded-lg h-full p-4">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">
-              AI Response
-            </h2>
-            <div className="h-[calc(100%-50px)] border border-gray-300 rounded-md p-4 overflow-auto">
-              {isLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  {/* <svg 
-                  className="animate-spin h-8 w-8 text-blue-500 mr-3" 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  fill="none" 
-                  viewBox="0 0 24 24"
-                >
-                  <circle 
-                    className="opacity-25" 
-                    cx="12" 
-                    cy="12" 
-                    r="10" 
-                    stroke="currentColor" 
-                    strokeWidth="4"
-                  ></circle>
-                  <path 
-                    className="opacity-75" 
-                    fill="currentColor" 
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg> */}
-                  <span className="text-gray-600">AI is thinking...</span>
-                </div>
-              ) : (
-                <p
-                  className={`${
-                    messages.length > 0 ? "text-gray-800" : "text-gray-400"
-                  }`}
-                >
-                  {messages.length > 0
-                    ? messages[messages.length - 1].type === "ai"
-                      ? messages[messages.length - 1].content
-                      : "Your AI response will appear here"
-                    : "Your AI response will appear here"}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
-    </>
+    </div>
   );
 };
 
 export default AIChatInterface;
+
+

@@ -9,6 +9,7 @@ import BookNav from "./BookNav";
 import NavToHome from "./NavToHome";
 import ChatInterface from "./chat";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Semester from "./Semester";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/" element={<Navigate to="/books" replace />} />
         <Route path="/books" element={<BookBrowsingApp />} />
         <Route path="/chat" element={<ChatInterface />} />
+        <Route path="/sem" element={<Semester />} />
       </Routes>
     </BrowserRouter>
   );

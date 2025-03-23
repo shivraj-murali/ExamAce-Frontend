@@ -55,10 +55,7 @@ import AIChatInterface from "./playground";
 //     },
 //   ],
 // };
-const SUBJECTS = [
-  "Operating Systems",
-  "Machine Learning",
-];
+const SUBJECTS = ["Operating Systems", "Machine Learning"];
 
 const BOOKS = {
   "Operating Systems": [
@@ -78,9 +75,9 @@ const BOOKS = {
   "Machine Learning": [
     {
       id: 3,
-      title:
-        "Machine Learning: An Algorithmic Perspective",
-      cover: "https://m.media-amazon.com/images/I/61qWAvARI6L._AC_UF1000,1000_QL80_.jpg",
+      title: "Machine Learning: An Algorithmic Perspective",
+      cover:
+        "https://m.media-amazon.com/images/I/61qWAvARI6L._AC_UF1000,1000_QL80_.jpg",
     },
     {
       id: 4,
@@ -102,15 +99,15 @@ const BookBrowsingApp = () => {
   // Handler for book image click
   const handleBookClick = (book) => {
     // Log the book details to console
-    console.log('Selected Book:', book);
-    
+    console.log("Selected Book:", book);
+
     // Navigate to Chat interface with book information
-    navigate('/chat', { 
-      state: { 
+    navigate("/chat", {
+      state: {
         bookTitle: book.title,
         bookCover: book.cover,
-        bookId: book.id
-      } 
+        bookId: book.id,
+      },
     });
   };
 
@@ -186,7 +183,9 @@ const BookBrowsingApp = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <p className="text-white text-sm font-medium">Click to start learning</p>
+                        <p className="text-white text-sm font-medium">
+                          Click to start learning
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -196,8 +195,12 @@ const BookBrowsingApp = () => {
                     </h3>
                     <div className="flex items-center text-sm text-gray-400">
                       <span className="flex items-center">
-                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+                        <svg
+                          className="w-4 h-4 mr-1"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
                         </svg>
                         Interactive Learning
                       </span>
